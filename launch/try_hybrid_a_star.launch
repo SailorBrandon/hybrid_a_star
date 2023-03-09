@@ -1,6 +1,6 @@
 <launch>
 
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find racebot_gazebo)/maps/mymap.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find hybrid_a_star)/maps/mymap.yaml"/>
     
     <node name="hybrid_a_star_node" pkg="hybrid_a_star" type="hybrid_a_star_node" output="screen"/>
 
