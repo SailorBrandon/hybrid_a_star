@@ -3,6 +3,9 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <tf/transform_listener.h>
+#include <costmap_2d/costmap_2d_ros.h>
+
 #include "hybrid_a_star/hybrid_a_star.h"
 
 using namespace hybrid_a_star;

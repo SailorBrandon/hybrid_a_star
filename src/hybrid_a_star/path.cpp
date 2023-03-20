@@ -7,18 +7,20 @@ namespace hybrid_a_star
         path_pub_ = nh.advertise<nav_msgs::Path>("path", 1);
         start_ = boost::make_shared<geometry_msgs::PoseStamped>();
         goal_ = boost::make_shared<geometry_msgs::PoseStamped>();
+        hasGoal = false;
+        hasStart = false;
     }
 
     void PosePath::setStart(const geometry_msgs::PoseStamped& start)
     {
-        setStart_ = true;
+        hasStart = true;
         start_->header.frame_id = "/map";
         listener.transformPose("/hy_map", ros::Time(0), start, "/map", *start_);
     }
 
     void PosePath::setGoal(const geometry_msgs::PoseStamped& goal)
     {
-        setGoal_ = true;
+        hasGoal = true;
         goal_->header.frame_id = "/map";
         listener.transformPose("/hy_map", ros::Time(0), goal, "/map", *goal_);
         // Debug
@@ -47,9 +49,9 @@ namespace hybrid_a_star
         }
     }
 
-    bool PosePath::endPtReady()
+    bool PosePath::ready()
     {
-        return setStart_ && setGoal_;
+        return hasStart && hasGoal;
     }
 
     void PosePath::pubPath()

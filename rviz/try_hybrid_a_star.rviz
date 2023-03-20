@@ -90,7 +90,7 @@ Visualization Manager:
       Enabled: true
       Head Length: 0.30000001192092896
       Head Radius: 0.10000000149011612
-      Name: Pose
+      Name: Goal
       Queue Size: 10
       Shaft Length: 1
       Shaft Radius: 0.05000000074505806
@@ -102,7 +102,7 @@ Visualization Manager:
       Axes Length: 1
       Axes Radius: 0.10000000149011612
       Class: rviz/PoseWithCovariance
-      Color: 255; 25; 0
+      Color: 114; 159; 207
       Covariance:
         Orientation:
           Alpha: 0.5
@@ -117,11 +117,11 @@ Visualization Manager:
           Color: 204; 51; 204
           Scale: 1
           Value: true
-        Value: true
+        Value: false
       Enabled: true
       Head Length: 0.30000001192092896
       Head Radius: 0.10000000149011612
-      Name: PoseWithCovariance
+      Name: Init
       Queue Size: 10
       Shaft Length: 1
       Shaft Radius: 0.05000000074505806
@@ -137,7 +137,7 @@ Visualization Manager:
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
+      Line Style: Billboards
       Line Width: 0.029999999329447746
       Name: Path
       Offset:
@@ -145,7 +145,7 @@ Visualization Manager:
         Y: 0
         Z: 0
       Pose Color: 255; 85; 255
-      Pose Style: None
+      Pose Style: Axes
       Queue Size: 10
       Radius: 0.029999999329447746
       Shaft Diameter: 0.10000000149011612
@@ -180,20 +180,26 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
-      Class: rviz/TopDownOrtho
+      Class: rviz/XYOrbit
+      Distance: 8.066532135009766
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Field of View: 0.7853981852531433
+      Focal Point:
+        X: -0.9550469517707825
+        Y: -1.3822925090789795
+        Z: 4.76837158203125e-07
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 28.05983543395996
+      Pitch: 1.070397973060608
       Target Frame: <Fixed Frame>
-      X: -2.6815743446350098
-      Y: -2.5019447803497314
+      Yaw: 4.728585243225098
     Saved: ~
 Window Geometry:
   Displays:

@@ -1,10 +1,7 @@
 #ifndef HYBRID_A_STAR_H
 #define HYBRID_A_STAR_H
 
-#include <ompl/base/spaces/ReedsSheppStateSpace.h>
-#include <ompl/base/spaces/DubinsStateSpace.h>
-#include <ompl/base/spaces/SE2StateSpace.h>
-#include <ompl/base/State.h>
+
 
 #include <boost/heap/binomial_heap.hpp>
 
@@ -13,6 +10,7 @@
 #include "hybrid_a_star/constants.h"
 #include "hybrid_a_star/tf_broadcaster.h"
 
+#include "hybrid_a_star/reeds_shepp.h"
 #include <nav_msgs/OccupancyGrid.h>
 
 namespace hybrid_a_star
@@ -20,11 +18,17 @@ namespace hybrid_a_star
     class HybridAStar
     {
     public:
-        HybridAStar(){};
+        HybridAStar(): rs_planner_(Constants::minTurnR) {};
         bool plan(PosePath &path, Space &space);
+
+    
+    private:
         Node3D *forwardSearch(PosePath &path, Space &space, std::vector<Node3D> &nodes3D);
         void backTrack(const Node3D *nSoln, std::vector<Node3D> &nodePath);
+        ReedsSheppStateSpace rs_planner_;
     };
+
+
 }
 
 #endif

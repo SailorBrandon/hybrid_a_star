@@ -19,7 +19,7 @@ namespace hybrid_a_star
             void setStart(const geometry_msgs::PoseStamped& start);
             void setGoal(const geometry_msgs::PoseStamped& goal);
             void updatePath(const std::vector<Node3D> &nodePath);
-            bool endPtReady();
+            bool ready();
             void pubPath();
             const geometry_msgs::PoseStamped::Ptr& getStart() const {return start_;}
             const geometry_msgs::PoseStamped::Ptr& getGoal() const {return goal_;}
@@ -30,8 +30,8 @@ namespace hybrid_a_star
             geometry_msgs::PoseStamped::Ptr goal_;
             nav_msgs::Path path_;
             tf::TransformListener listener;
-            bool setStart_;
-            bool setGoal_;
+            bool hasGoal;
+            bool hasStart;
     };
 }
 

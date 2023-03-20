@@ -13,11 +13,11 @@ namespace hybrid_a_star
         //[m] Uniformly add pads around the vehicle
         static const double bloating = 0.0;
         //[m] The width of the vehicle
-        static const double vehWidth = 0.175 + 2 * bloating;
+        static const double vehWidth = 0.18 + 2 * bloating;
         //[m] The length of the vehicle
-        static const double vehLength = 0.3 + 2 * bloating;
+        static const double vehLength = 0.25 + 2 * bloating;
         //[m] The minimum turning radius of the vehicle
-        static const double minTurnR = 0.5;
+        static const double minTurnR = 1;
 
         //[#] The number of directon
         static const int numDir = 6;

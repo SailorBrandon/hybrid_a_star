@@ -10,12 +10,13 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   tf
+  costmap_2d
 )
 
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES hybrid_a_star
- CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs tf
+ CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs tf costmap_2d
 )
 
 find_package(ompl REQUIRED)

@@ -4,9 +4,9 @@ namespace hybrid_a_star
 {
     bool HybridAStar::plan(PosePath &path, Space &space)
     {
-        if (!path.endPtReady())
+        if (!path.ready())
         {
-            ROS_ERROR("Missing start pose!");
+            ROS_ERROR("Missing start or goal!");
             return false;
         }
         ros::Time t0 = ros::Time::now();
@@ -54,23 +54,21 @@ namespace hybrid_a_star
             return nullptr;
         }
 
-        // std::shared_ptr<Node3D> nPred;
-        Node3D* nPred;
+        Node3D *nPred;
         int iPred = startNode.setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
         nodes3D[iPred] = startNode;
 
-        // std::shared_ptr<Node3D> nSucc;
-        Node3D* nSucc;
+        // Node3D* nSucc;
+        std::shared_ptr<Node3D> nSucc;
         int iSucc;
         nodes3D[iPred].setOpen();
         openSet.push(&nodes3D[iPred]);
 
         int iter = 0;
-        double newG;
+        double newG = 0;
         while (!openSet.empty())
         {
             ++iter;
-            // nPred.reset(openSet.top());
             nPred = openSet.top();
             iPred = nPred->setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
             openSet.pop();
@@ -89,15 +87,20 @@ namespace hybrid_a_star
                 }
                 else
                 {
-                    // Search with Dubins Shot
+                    // Search with RS Shot
+                    ReedsSheppStateSpace rs_planner(Constants::minTurnR);
+                    double length = 0;
+                    double q0[] = {path.getStart()->pose.position.x, path.getStart()->pose.position.y, tf::getYaw(path.getStart()->pose.orientation)};
+                    double q1[] = {path.getGoal()->pose.position.x, path.getGoal()->pose.position.y, tf::getYaw(path.getGoal()->pose.orientation)};
+                    std::vector<std::vector<double>> rs_path;
+                    rs_planner.sample(q0, q1, Constants::dubinsStepSize, length, rs_path);
 
                     // Search with forward simulation
                     for (int i = 0; i < Constants::numDir; ++i)
                     {
-                        // nSucc.reset(nPred->getSucc(i));
-                        nSucc = nPred->getSucc(i);
+                        nSucc.reset(nPred->getSucc(i));
                         iSucc = nSucc->setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
-                        if (space.isTraversable(nSucc))
+                        if (space.isTraversable(nSucc.get()))
                         {
                             if (!nodes3D[iSucc].isClosed() || iPred == iSucc)
                             {
@@ -109,7 +112,6 @@ namespace hybrid_a_star
                                     // if the successor is in the same cell but the C value is larger
                                     if (iPred == iSucc && nSucc->getC() > nPred->getC() + Constants::tieBreaker)
                                     {
-                                        delete nSucc;
                                         continue;
                                     }
                                     // if successor is in the same cell and the C value is lower, set predecessor to predecessor of predecessor
@@ -117,26 +119,14 @@ namespace hybrid_a_star
                                     {
                                         nSucc->setPred(nPred->getPred());
                                     }
-
-                                    if (nSucc->getPred() == nSucc)
+                                    if (nSucc->getPred() == nSucc.get())
                                     {
                                         std::cout << "looping";
                                     }
-
                                     nSucc->setOpen();
                                     nodes3D[iSucc] = *nSucc;
-                                    std::cout << "pushing a new node" << std::endl;
                                     openSet.push(&nodes3D[iSucc]);
-                                    delete nSucc;
                                 }
-                                else
-                                {
-                                    delete nSucc;
-                                }
-                            }
-                            else
-                            {
-                                delete nSucc;
                             }
                         }
                     }
