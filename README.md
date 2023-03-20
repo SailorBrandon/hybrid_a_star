@@ -1,4 +1,4 @@
-# Hybrid_A_Star
+# Hybrid A* Planner
 A reproduction of Hybrid A* for autonomous vehicles
 
 # Reference
