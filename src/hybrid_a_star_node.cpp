@@ -26,15 +26,15 @@ class HybridAStarNode
 
         void setMap(const nav_msgs::OccupancyGrid::Ptr map)
         {
-            ROS_INFO("Map received...");
+            ROS_INFO("Map received");
             space_.setMap(map);
         }
 
         void setGoal(const geometry_msgs::PoseStamped::Ptr goal)
         {
-            ROS_INFO("Goal received, start planning...");
+            ROS_INFO("Goal received");
             path_.setGoal(*goal);
-            if (hybrid_a_star_->plan(path_, space_))
+            if (path_.ready() && hybrid_a_star_->plan(path_, space_))
             {
                 path_.pubPath();
             }
@@ -42,16 +42,20 @@ class HybridAStarNode
 
         void setInitPose(const geometry_msgs::PoseWithCovarianceStamped::Ptr start)
         {
-            ROS_INFO("Init pose received...");
+            ROS_INFO("Init pose received");
             geometry_msgs::PoseStamped::Ptr start_pose = boost::make_shared<geometry_msgs::PoseStamped>();
             start_pose->header = start->header;
             start_pose->pose = start->pose.pose;
             path_.setStart(*start_pose);
+            if (path_.ready() && hybrid_a_star_->plan(path_, space_))
+            {
+                path_.pubPath();
+            }
         }
 
         void setOdom(const nav_msgs::Odometry::Ptr odom)
         {
-            ROS_INFO("Odom received...");
+            ROS_INFO("Odom received");
             geometry_msgs::PoseStamped::Ptr start_pose = boost::make_shared<geometry_msgs::PoseStamped>();
             start_pose->header = odom->header;
             start_pose->pose = odom->pose.pose;

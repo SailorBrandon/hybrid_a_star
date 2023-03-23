@@ -33,6 +33,7 @@ add_library(${PROJECT_NAME}
   src/hybrid_a_star/path.cpp
   src/hybrid_a_star/node3d.cpp
   src/hybrid_a_star/space.cpp
+  src/hybrid_a_star/reeds_shepp.cpp
 )
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${OMPL_LIBRARIES})

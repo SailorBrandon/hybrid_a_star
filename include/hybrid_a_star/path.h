@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
 #include <nav_msgs/Path.h>
@@ -18,17 +19,17 @@ namespace hybrid_a_star
             PosePath(ros::NodeHandle& nh);
             void setStart(const geometry_msgs::PoseStamped& start);
             void setGoal(const geometry_msgs::PoseStamped& goal);
-            void updatePath(const std::vector<Node3D> &nodePath);
-            bool ready();
+            Node3D* getStart() { return &start_; }
+            Node3D* getGoal() { return &goal_; }
+            bool ready() const { return hasStart && hasGoal; }
+            void backTrack(const Node3D *nSoln, int pathLen);
             void pubPath();
-            const geometry_msgs::PoseStamped::Ptr& getStart() const {return start_;}
-            const geometry_msgs::PoseStamped::Ptr& getGoal() const {return goal_;}
-
+        
         private:
             ros::Publisher path_pub_;
-            geometry_msgs::PoseStamped::Ptr start_;
-            geometry_msgs::PoseStamped::Ptr goal_;
-            nav_msgs::Path path_;
+            Node3D start_;
+            Node3D goal_;
+            std::vector<Node3D> nodePath_;
             tf::TransformListener listener;
             bool hasGoal;
             bool hasStart;

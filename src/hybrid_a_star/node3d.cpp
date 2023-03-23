@@ -3,8 +3,13 @@
 namespace hybrid_a_star
 {
 
-    Node3D::Node3D(double x, double y, double yaw, double g, double h, const Node3D *pred, NodeType type, int idx, int primIdx)
-        : x(x), y(y), yaw(yaw), g(g), h(h), pred(pred), type(type), idx(idx), primIdx(primIdx)
+    Node3D::Node3D(double x, double y, double yaw, double g, double h, const Node3D *pred, NodeType type, int idx, int primIdx, bool backward)
+        : x(x), y(y), yaw(yaw), g(g), h(h), pred(pred), type(type), idx(idx), primIdx(primIdx), backward(backward)
+    {
+    }
+
+    Node3D::Node3D(const Node3D *other)
+        : x(other->x), y(other->y), yaw(other->yaw), g(other->g), h(other->h), pred(other->pred), type(other->type), idx(other->idx), primIdx(other->primIdx), backward(other->backward)
     {
     }
 
@@ -27,6 +32,7 @@ namespace hybrid_a_star
             xSucc = x + dx[i] * cos(yaw) - dy[i] * sin(yaw); 
             ySucc = y + dx[i] * sin(yaw) + dy[i] * cos(yaw);
             yawSucc = Utils::normalizeYawRad(yaw + dyaw[i]);
+            return new Node3D(xSucc, ySucc, yawSucc, g, 0, this, UNDEF, -1, i, false);
         }
         // backwards
         else
@@ -34,8 +40,8 @@ namespace hybrid_a_star
             xSucc = x - dx[i - 3] * cos(yaw) - dy[i - 3] * sin(yaw);
             ySucc = y - dx[i - 3] * sin(yaw) + dy[i - 3] * cos(yaw);
             yawSucc = Utils::normalizeYawRad(yaw - dyaw[i - 3]);
+            return new Node3D(xSucc, ySucc, yawSucc, g, 0, this, UNDEF, -1, i, true);
         }
-        return new Node3D(xSucc, ySucc, yawSucc, g, 0, this, UNDEF, -1, i);
     }
 
     void Node3D::updateG()
@@ -82,7 +88,7 @@ namespace hybrid_a_star
                 g += dx[0] * Constants::penaltyReversing;
             }
         }
-    }
+    }    
 
     void Node3D::updateH(const Node3D *goal)
     {
@@ -91,10 +97,9 @@ namespace hybrid_a_star
 
     bool Node3D::operator==(const Node3D &rhs) const
     {
-        return static_cast<int>(x) == static_cast<int>(rhs.x) &&
-               static_cast<int>(y) == static_cast<int>(rhs.y) &&
-               (std::abs(yaw - rhs.yaw) <= Constants::deltaYawDeg ||
-                std::abs(yaw - rhs.yaw) >= Constants::deltaYawNegRad);
+        return (std::abs(x - rhs.x) <= Constants::vehLength/10) &&
+               (std::abs(y - rhs.y) <= Constants::vehLength/10) &&
+               std::abs(yaw - rhs.yaw) <= Constants::deltaYawRad;
     }
 
 }

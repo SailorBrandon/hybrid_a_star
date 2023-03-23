@@ -29,13 +29,13 @@
  *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
  *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THET
  *  POSSIBILITY OF SUCH DAMAGE.
  *
  * Author:  Guan-Horng Liu
  *********************************************************************/
 
-#include "ReedsShepp.h"
+#include "hybrid_a_star/reeds_shepp.h"
 #include <boost/math/constants/constants.hpp>
 #include <iostream>
 

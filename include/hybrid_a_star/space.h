@@ -1,10 +1,11 @@
 #ifndef SPACE_H
 #define SPACE_H
 
-#include "node3d.h"
-#include "constants.h"
+#include "hybrid_a_star/node3d.h"
+#include "hybrid_a_star/node3d.h"
 #include <vector>
 #include <nav_msgs/OccupancyGrid.h>
+#include <ros/ros.h>
 
 namespace hybrid_a_star
 {
@@ -18,6 +19,7 @@ namespace hybrid_a_star
             int getDimY() const {return dimY_;}
             int getDimYaw() const {return dimYaw_;}
             bool isTraversable(const Node3D* node) const;
+            bool isTraversable(const double x, const double y, const double yaw);
             void setMap(const nav_msgs::OccupancyGrid::Ptr map);
 
         private:

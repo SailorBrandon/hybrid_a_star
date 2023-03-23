@@ -10,19 +10,37 @@ namespace hybrid_a_star
             return false;
         }
         ros::Time t0 = ros::Time::now();
-        std::vector<Node3D> nodes3D(space.getSize());
-        Node3D *nSoln = forwardSearch(path, space, nodes3D);
+        int pathLen = 0;
+        Node3D* startPtr = new Node3D(path.getStart());
+        Node3D* goalPtr = new Node3D(path.getGoal());
+        std::unordered_map<int, Node3D *> closedSet;
+        std::unordered_map<int, Node3D *> openSet;
+        Node3D *nSoln = forwardSearch(startPtr, goalPtr, space, pathLen, closedSet, openSet);
         if (nSoln == nullptr)
         {
             ROS_ERROR("No solution found!");
+            ros::Time t1 = ros::Time::now();
+            ros::Duration d = t1 - t0;
+            ROS_INFO("TIME in ms: %f", d.toSec() * 1000);   
             return false;
         }
-        std::vector<Node3D> nodePath;
-        backTrack(nSoln, nodePath);
-        path.updatePath(nodePath);
+        path.backTrack(nSoln, pathLen);
+        for (auto &node : closedSet)
+        {
+            // std::cout << "closedSet: " << node.first << std::endl;
+            delete node.second;
+        }
+        for (auto &node : openSet)
+        {
+            // TODO: elements in openSet and closedSet are the same
+            // std::cout << "openSet: " << node.first << std::endl;
+            if (closedSet.find(node.first) == closedSet.end())
+                delete node.second;
+        }
+        // smoother_.smooth(path);
         ros::Time t1 = ros::Time::now();
-        ros::Duration d(t1 - t0);
-        ROS_INFO("TIME in ms: %f", d.toSec() * 1000);
+        ros::Duration d = t1 - t0;
+        ROS_INFO("TIME in ms: %f", d.toSec() * 1000);        
         return true;
     }
 
@@ -35,117 +53,92 @@ namespace hybrid_a_star
         }
     };
 
-    Node3D *HybridAStar::forwardSearch(PosePath &path, Space &space, std::vector<Node3D> &nodes3D)
+    Node3D *HybridAStar::forwardSearch(Node3D *startPtr,
+                                       Node3D *goalPtr,
+                                       Space &space,
+                                       int &pathLen,
+                                       std::unordered_map<int, Node3D *> &closedSet,
+                                       std::unordered_map<int, Node3D *> &openSet)
     {
-        typedef boost::heap::binomial_heap<Node3D *,
-                                           boost::heap::compare<CompareNodes>>
-            priorityQueue;
-        priorityQueue openSet;
 
-        Node3D startNode(path.getStart()->pose.position.x,
-                         path.getStart()->pose.position.y,
-                         tf::getYaw(path.getStart()->pose.orientation));
-        Node3D goalNode(path.getGoal()->pose.position.x,
-                        path.getGoal()->pose.position.y,
-                        tf::getYaw(path.getGoal()->pose.orientation));
-        if (!space.isTraversable(&startNode) || !space.isTraversable(&goalNode))
+        if (!space.isTraversable(startPtr) || !space.isTraversable(goalPtr))
         {
             ROS_WARN("Start or goal node is not traversable...");
             return nullptr;
         }
 
-        Node3D *nPred;
-        int iPred = startNode.setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
-        nodes3D[iPred] = startNode;
+        std::priority_queue<Node3D *, std::vector<Node3D *>, CompareNodes> priQue;
 
-        // Node3D* nSucc;
-        std::shared_ptr<Node3D> nSucc;
+        Node3D *nPred;
+        int iPred;
+        Node3D *nSucc;
         int iSucc;
-        nodes3D[iPred].setOpen();
-        openSet.push(&nodes3D[iPred]);
+
+        openSet[startPtr->setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY())] = startPtr;
+        priQue.push(startPtr);
 
         int iter = 0;
-        double newG = 0;
-        while (!openSet.empty())
+        while (!priQue.empty() && iter < Constants::maxIter)
         {
             ++iter;
-            nPred = openSet.top();
+            nPred = priQue.top();
             iPred = nPred->setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
-            openSet.pop();
-            // Check for rewired node
-            if (nodes3D[iPred].isClosed())
+            closedSet[iPred] = nPred;
+            priQue.pop();
+            if (*nPred == *goalPtr)
             {
-                continue;
+                pathLen = iter;
+                ROS_INFO("Found a plan by forward search, iter: %d", iter);
+                return nPred;
             }
-            // Expanding the node
-            else
+            // finding solution by reeds-shepps shot
+            if (iter % Constants::rsShotPeriod == 0)
             {
-                nodes3D[iPred].setClosed();
-                if (*nPred == goalNode || iter > Constants::maxIter)
+                Node3D *nSoln = rsShot(nPred, goalPtr, space, pathLen);
+                pathLen += iter;
+                if (nSoln != nullptr)
                 {
-                    return nPred;
+                    ROS_INFO("Found a plan by RS shot, iter: %d", iter);
+                    return nSoln;
+                }
+            }
+            //  finding solution by forward simulation
+            for (int i = 0; i < Constants::numDir; ++i)
+            {
+                nSucc = nPred->getSucc(i);
+                iSucc = nSucc->setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
+                if (space.isTraversable(nSucc))
+                {
+                    if (closedSet.find(iSucc) == closedSet.end())
+                    {
+                        nSucc->updateG();
+                        if (openSet.find(iSucc) == openSet.end() || nSucc->getG() < openSet[iSucc]->getG())
+                        {
+                            nSucc->updateH(goalPtr);
+                            openSet[iSucc] = nSucc;
+                            priQue.push(nSucc);
+                        }
+                        else
+                        {
+                            delete nSucc;
+                        }
+                    }
+                    else
+                    {
+                        delete nSucc;
+                    }
                 }
                 else
                 {
-                    // Search with RS Shot
-                    ReedsSheppStateSpace rs_planner(Constants::minTurnR);
-                    double length = 0;
-                    double q0[] = {path.getStart()->pose.position.x, path.getStart()->pose.position.y, tf::getYaw(path.getStart()->pose.orientation)};
-                    double q1[] = {path.getGoal()->pose.position.x, path.getGoal()->pose.position.y, tf::getYaw(path.getGoal()->pose.orientation)};
-                    std::vector<std::vector<double>> rs_path;
-                    rs_planner.sample(q0, q1, Constants::dubinsStepSize, length, rs_path);
-
-                    // Search with forward simulation
-                    for (int i = 0; i < Constants::numDir; ++i)
-                    {
-                        nSucc.reset(nPred->getSucc(i));
-                        iSucc = nSucc->setIdx(space.getDimX(), space.getDimY(), space.getDimYaw(), space.getDeltaXY());
-                        if (space.isTraversable(nSucc.get()))
-                        {
-                            if (!nodes3D[iSucc].isClosed() || iPred == iSucc)
-                            {
-                                nSucc->updateG();
-                                newG = nSucc->getG();
-                                if (!nodes3D[iSucc].isOpen() || newG < nodes3D[iSucc].getG() || iPred == iSucc)
-                                {
-                                    nSucc->updateH(&goalNode);
-                                    // if the successor is in the same cell but the C value is larger
-                                    if (iPred == iSucc && nSucc->getC() > nPred->getC() + Constants::tieBreaker)
-                                    {
-                                        continue;
-                                    }
-                                    // if successor is in the same cell and the C value is lower, set predecessor to predecessor of predecessor
-                                    else if (iPred == iSucc && nSucc->getC() <= nPred->getC() + Constants::tieBreaker)
-                                    {
-                                        nSucc->setPred(nPred->getPred());
-                                    }
-                                    if (nSucc->getPred() == nSucc.get())
-                                    {
-                                        std::cout << "looping";
-                                    }
-                                    nSucc->setOpen();
-                                    nodes3D[iSucc] = *nSucc;
-                                    openSet.push(&nodes3D[iSucc]);
-                                }
-                            }
-                        }
-                    }
+                    delete nSucc;
                 }
             }
         }
         return nullptr;
     }
 
-    void HybridAStar::backTrack(const Node3D *nSoln, std::vector<Node3D> &nodePath)
+    Node3D *HybridAStar::rsShot(Node3D *startPtr, Node3D *goalPtr, Space &space, int &pathLen)
     {
-        nodePath.reserve(Constants::maxIter / 100);
-        const Node3D *n = nSoln;
-        while (n != nullptr)
-        {
-            nodePath.push_back(*n);
-            n = n->getPred();
-        }
-        std::reverse(nodePath.begin(), nodePath.end());
-        nodePath.shrink_to_fit();
+        return nullptr;
     }
 }

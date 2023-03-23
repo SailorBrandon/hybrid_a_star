@@ -49,6 +49,9 @@ namespace hybrid_a_star
         static const float dubinsShotDistance = 100;
         /// [m] --- The step size for the analytical solution (Dubin's shot) primarily relevant for collision checking
         static const float dubinsStepSize = 1;
+        /// [#] --- The period of the RS shot
+        static const int rsShotPeriod = 10;
+
     };
 
 }

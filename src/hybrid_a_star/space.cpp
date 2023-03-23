@@ -10,6 +10,7 @@ namespace hybrid_a_star
         dimYaw_ = Constants::dimYaw;
         deltaXY_ = map->info.resolution;
         map_.resize(dimX_);
+        ROS_INFO("Map size: %d , %d", dimX_, dimY_);
         for (int i = 0; i < dimX_; i++)
         {
             map_[i].resize(dimY_);
@@ -26,6 +27,15 @@ namespace hybrid_a_star
         int iX = static_cast<int>(node->getX() / deltaXY_);
         int iY = static_cast<int>(node->getY() / deltaXY_);
         int iYaw = static_cast<int>(node->getYaw() / Constants::deltaYawRad);
+        return iX >= 0 && iX < dimX_ && iY >= 0 && iY < dimY_ && iYaw >= 0 && iYaw < dimYaw_ &&
+               map_[iX][iY] >= 0 && map_[iX][iY] < obstacleThreshold_;
+    }
+
+    bool Space::isTraversable(const double x, const double y, const double yaw)
+    {
+        int iX = static_cast<int>(x / deltaXY_);
+        int iY = static_cast<int>(y / deltaXY_);
+        int iYaw = static_cast<int>(yaw / Constants::deltaYawRad);
         return iX >= 0 && iX < dimX_ && iY >= 0 && iY < dimY_ && iYaw >= 0 && iYaw < dimYaw_ &&
                map_[iX][iY] >= 0 && map_[iX][iY] < obstacleThreshold_;
     }
