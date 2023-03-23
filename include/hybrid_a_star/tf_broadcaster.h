@@ -1,6 +1,8 @@
 #ifndef TF_BROADCASTER_H
 #define TF_BROADCASTER_H
 
+#include <iostream>
+
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
@@ -23,6 +25,7 @@ namespace hybrid_a_star
             ros::Publisher map_pose_pub_;
             tf::Pose hyMapPose_; // the origin of the map
             ros::Timer timer_;
+            bool mapReceived;
     };
 }
 

@@ -45,12 +45,17 @@ namespace hybrid_a_star
         static const float penaltyReversing = 2.0;
         /// [#] --- A movement cost penalty for change of direction (changing from primitives < 3 to primitives > 2)
         static const float penaltyCOD = 2.0;
+
         /// [m] --- The distance to the goal when the analytical solution (Dubin's shot) first triggers
         static const float dubinsShotDistance = 100;
         /// [m] --- The step size for the analytical solution (Dubin's shot) primarily relevant for collision checking
         static const float dubinsStepSize = 1;
+
         /// [#] --- The period of the RS shot
         static const int rsShotPeriod = 10;
+        /// [m] --- The step size for the analytical solution (Reeds-Shepp's shot) primarily relevant for collision checking
+        static const float rsStepSize = 0.1;
+
 
     };
 

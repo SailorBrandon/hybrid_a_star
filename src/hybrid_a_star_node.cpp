@@ -68,7 +68,6 @@ class HybridAStarNode
         ros::Subscriber goal_sub_;
         ros::Subscriber init_pose_sub_;
         ros::Subscriber obsv_sub_;
-
         std::shared_ptr<HybridAStar> hybrid_a_star_;
         Space space_;
         PosePath path_;

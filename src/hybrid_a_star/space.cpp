@@ -27,7 +27,7 @@ namespace hybrid_a_star
         int iX = static_cast<int>(node->getX() / deltaXY_);
         int iY = static_cast<int>(node->getY() / deltaXY_);
         int iYaw = static_cast<int>(node->getYaw() / Constants::deltaYawRad);
-        return iX >= 0 && iX < dimX_ && iY >= 0 && iY < dimY_ && iYaw >= 0 && iYaw < dimYaw_ &&
+        return iX >= 0 && iX < dimX_ && iY >= 0 && iY < dimY_  &&
                map_[iX][iY] >= 0 && map_[iX][iY] < obstacleThreshold_;
     }
 
@@ -36,7 +36,7 @@ namespace hybrid_a_star
         int iX = static_cast<int>(x / deltaXY_);
         int iY = static_cast<int>(y / deltaXY_);
         int iYaw = static_cast<int>(yaw / Constants::deltaYawRad);
-        return iX >= 0 && iX < dimX_ && iY >= 0 && iY < dimY_ && iYaw >= 0 && iYaw < dimYaw_ &&
+        return iX >= 0 && iX < dimX_ && iY >= 0 && iY < dimY_  &&
                map_[iX][iY] >= 0 && map_[iX][iY] < obstacleThreshold_;
     }
 }

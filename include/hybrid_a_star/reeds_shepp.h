@@ -74,7 +74,7 @@ public:
 
     double distance(double q0[3], double q1[3]);
 
-    void sample(double q0[3], double q1[3], double step_size, double &length, std::vector<std::vector<double> > &points);
+    void sample(double q0[3], double q1[3], double step_size, std::vector<std::vector<double> > &points);
 
     /** \brief Return the shortest Reeds-Shepp path from SE(2) state state1 to SE(2) state state2 */
     ReedsSheppPath reedsShepp(double q0[3], double q1[3]);

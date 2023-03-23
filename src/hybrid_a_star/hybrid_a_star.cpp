@@ -10,7 +10,7 @@ namespace hybrid_a_star
             return false;
         }
         ros::Time t0 = ros::Time::now();
-        int pathLen = 0;
+        std::pair<int, int> pathLen;
         Node3D* startPtr = new Node3D(path.getStart());
         Node3D* goalPtr = new Node3D(path.getGoal());
         std::unordered_map<int, Node3D *> closedSet;
@@ -56,7 +56,7 @@ namespace hybrid_a_star
     Node3D *HybridAStar::forwardSearch(Node3D *startPtr,
                                        Node3D *goalPtr,
                                        Space &space,
-                                       int &pathLen,
+                                       std::pair<int, int> &pathLen,
                                        std::unordered_map<int, Node3D *> &closedSet,
                                        std::unordered_map<int, Node3D *> &openSet)
     {
@@ -87,18 +87,18 @@ namespace hybrid_a_star
             priQue.pop();
             if (*nPred == *goalPtr)
             {
-                pathLen = iter;
-                ROS_INFO("Found a plan by forward search, iter: %d", iter);
+                pathLen.first = iter;
+                ROS_INFO("Found a plan by forward search (%d)", pathLen.first);
                 return nPred;
             }
             // finding solution by reeds-shepps shot
             if (iter % Constants::rsShotPeriod == 0)
             {
                 Node3D *nSoln = rsShot(nPred, goalPtr, space, pathLen);
-                pathLen += iter;
                 if (nSoln != nullptr)
                 {
-                    ROS_INFO("Found a plan by RS shot, iter: %d", iter);
+                    pathLen.first = iter;
+                    ROS_INFO("Found a plan by forward search (%d), RS shot (%d)", pathLen.first, pathLen.second);
                     return nSoln;
                 }
             }
@@ -137,8 +137,26 @@ namespace hybrid_a_star
         return nullptr;
     }
 
-    Node3D *HybridAStar::rsShot(Node3D *startPtr, Node3D *goalPtr, Space &space, int &pathLen)
+    Node3D *HybridAStar::rsShot(Node3D *startPtr, Node3D *goalPtr, Space &space, std::pair<int, int> &pathLen)
     {
-        return nullptr;
+        double q0[3] = {startPtr->getX(), startPtr->getY(), startPtr->getYaw()};
+        double q1[3] = {goalPtr->getX(), goalPtr->getY(), goalPtr->getYaw()};
+        std::vector<std::vector<double>> rs_path;
+        rs_planner_.sample(q0, q1, Constants::rsStepSize, rs_path);
+        for (auto point : rs_path)
+        {
+            if (!space.isTraversable(point[0], point[1], point[2]))
+            {
+                return nullptr;
+            }
+        }
+        pathLen.second = rs_path.size() - 1;
+        for (int i = 1; i < rs_path.size(); ++i)
+        {
+            Node3D *n = new Node3D(rs_path[i][0], rs_path[i][1], rs_path[i][2]);
+            n->setPred(startPtr);
+            startPtr = n;
+        }
+        return startPtr;
     }
 }

@@ -22,7 +22,7 @@ namespace hybrid_a_star
             Node3D* getStart() { return &start_; }
             Node3D* getGoal() { return &goal_; }
             bool ready() const { return hasStart && hasGoal; }
-            void backTrack(const Node3D *nSoln, int pathLen);
+            void backTrack(Node3D *nSoln, std::pair<int, int> pathLen);
             void pubPath();
         
         private:

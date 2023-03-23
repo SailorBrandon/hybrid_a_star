@@ -20,7 +20,7 @@ namespace hybrid_a_star
         public:
             Node3D(): Node3D(0, 0, 0, 0, 0, nullptr, UNDEF, 0, 0, false) {};
             Node3D(double x, double y, double yaw): Node3D(x, y, yaw, 0, 0, nullptr, UNDEF, 0, 0, false) {};
-            Node3D(double x, double y, double yaw, double g, double h, const Node3D* pred, NodeType type, int idx, int primIdx, bool backward);
+            Node3D(double x, double y, double yaw, double g, double h, Node3D* pred, NodeType type, int idx, int primIdx, bool backward);
             Node3D(const Node3D* other);
             double getX() const {return x;}
             void setX(double x) {this->x = x;}
@@ -34,9 +34,9 @@ namespace hybrid_a_star
             void setOpen() {type = OPEN;}
             bool isClosed() const {return type == CLOSED;}
             bool isOpen() const {return type == OPEN;}
-            const Node3D* getPred() const {return pred;}
-            Node3D* getSucc(const int i) const;
-            void setPred(const Node3D* pred) {this->pred = pred;}
+            Node3D* getPred() const {return pred;}
+            Node3D* getSucc(const int i);
+            void setPred(Node3D* pred) {this->pred = pred;}
             int setIdx(int dimX, int dimY, int dimYaw, double deltaXY);
             int getIdx() const {return idx;}
             bool isBackward() const {return backward;}
@@ -57,7 +57,7 @@ namespace hybrid_a_star
             double yaw;
             double g; // cost so far
             double h; // cost to go
-            const Node3D* pred;
+            Node3D* pred;
             NodeType type = UNDEF;
             int idx;
             int primIdx; // index of the motion primitive used to generate this node

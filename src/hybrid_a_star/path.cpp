@@ -29,20 +29,23 @@ namespace hybrid_a_star
         goal_.setX(goal_pose.pose.position.x);
         goal_.setY(goal_pose.pose.position.y);
         goal_.setYaw(tf::getYaw(goal_pose.pose.orientation));
-        // Debug
-        // std::cout << "Goal before transform: " << goal.pose.position.x << ", " << goal.pose.position.y << std::endl;
-        // std::cout << "Goal after transform: " << goal_->pose.position.x << ", " << goal_->pose.position.y << std::endl;
     }
 
-    void PosePath::backTrack(const Node3D *nSoln, int pathLen)
+    void PosePath::backTrack(Node3D *nSoln, std::pair<int, int> pathLen)
     {
         nodePath_.clear();
-        nodePath_.reserve(pathLen);
-        const Node3D *n = nSoln;
-        while (n != nullptr)
+        nodePath_.reserve(pathLen.first + pathLen.second);
+        int count = pathLen.second;
+        while (nSoln != nullptr)
         {
-            nodePath_.push_back(*n);
-            n = n->getPred();
+            nodePath_.push_back(*nSoln);
+            Node3D *tmp = nSoln;
+            nSoln = nSoln->getPred();
+            if (count > 0)
+            {
+                delete tmp;
+                count--;
+            }
         }
         std::reverse(nodePath_.begin(), nodePath_.end());
     }

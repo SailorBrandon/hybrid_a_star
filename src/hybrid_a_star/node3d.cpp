@@ -3,7 +3,7 @@
 namespace hybrid_a_star
 {
 
-    Node3D::Node3D(double x, double y, double yaw, double g, double h, const Node3D *pred, NodeType type, int idx, int primIdx, bool backward)
+    Node3D::Node3D(double x, double y, double yaw, double g, double h, Node3D *pred, NodeType type, int idx, int primIdx, bool backward)
         : x(x), y(y), yaw(yaw), g(g), h(h), pred(pred), type(type), idx(idx), primIdx(primIdx), backward(backward)
     {
     }
@@ -21,7 +21,7 @@ namespace hybrid_a_star
         return idx;
     }
 
-    Node3D *Node3D::getSucc(const int i) const
+    Node3D *Node3D::getSucc(const int i)
     {
         double xSucc;
         double ySucc;

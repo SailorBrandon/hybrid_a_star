@@ -550,12 +550,12 @@ ReedsSheppStateSpace::ReedsSheppPath ReedsSheppStateSpace::reedsShepp(double q0[
     return ::reedsShepp(x / rho_, y / rho_, dth);
 }
 
-void ReedsSheppStateSpace::sample(double q0[3], double q1[3], double step_size, double &length, std::vector<std::vector<double>> &points)
+void ReedsSheppStateSpace::sample(double q0[3], double q1[3], double step_size, std::vector<std::vector<double>> &points)
 {
     ReedsSheppPath path = reedsShepp(q0, q1);
-    length = rho_ * path.length();
+    double dist = rho_ * path.length();
 
-    for (double seg = 0.0; seg <= length; seg += step_size)
+    for (double seg = 0.0; seg <= dist; seg += step_size)
     {
         double qnew[5] = {};
         interpolate(q0, path, seg / rho_, qnew);

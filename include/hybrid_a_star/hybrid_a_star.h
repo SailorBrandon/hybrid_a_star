@@ -25,12 +25,12 @@ namespace hybrid_a_star
         Node3D *forwardSearch(Node3D *startNode,
                               Node3D *goalNode,
                               Space &space,
-                              int &pathLen,
+                              std::pair<int, int> &pathLen,
                               std::unordered_map<int, Node3D *> &closedSet,
                               std::unordered_map<int, Node3D *> &openSet);
         void backTrack(const Node3D *nSoln, std::vector<Node3D> &nodePath);
         ReedsSheppStateSpace rs_planner_;
-        Node3D *rsShot(Node3D *startNode, Node3D *goalNode, Space &space, int &pathLen);
+        Node3D *rsShot(Node3D *startNode, Node3D *goalNode, Space &space, std::pair<int, int> &pathLen);
     };
 
 }
