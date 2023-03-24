@@ -55,7 +55,7 @@ class HybridAStarNode
 
         void setOdom(const nav_msgs::Odometry::Ptr odom)
         {
-            ROS_INFO("Odom received");
+            // ROS_INFO("Odom received");
             geometry_msgs::PoseStamped::Ptr start_pose = boost::make_shared<geometry_msgs::PoseStamped>();
             start_pose->header = odom->header;
             start_pose->pose = odom->pose.pose;

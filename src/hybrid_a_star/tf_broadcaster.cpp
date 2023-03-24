@@ -25,6 +25,6 @@ namespace hybrid_a_star
     void HyTFBroadcaster::timerCallback(const ros::TimerEvent& event)
     {
         if (mapReceived)
-            broadcaster_.sendTransform(tf::StampedTransform(hyMapPose_, ros::Time::now(), "map", "hy_map"));
+            broadcaster_.sendTransform(tf::StampedTransform(hyMapPose_, ros::Time::now(), "/map", "hy_map"));
     }
 }

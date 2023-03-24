@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <ros/ros.h>
+#include <cmath>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
 #include <nav_msgs/Path.h>

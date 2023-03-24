@@ -154,6 +154,7 @@ namespace hybrid_a_star
         for (int i = 1; i < rs_path.size(); ++i)
         {
             Node3D *n = new Node3D(rs_path[i][0], rs_path[i][1], rs_path[i][2]);
+            n->setBackward(rs_path[i][4] < 0);
             n->setPred(startPtr);
             startPtr = n;
         }

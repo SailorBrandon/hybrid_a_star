@@ -2,26 +2,39 @@
 
 namespace hybrid_a_star
 {
-    PosePath::PosePath(ros::NodeHandle& nh)
+    PosePath::PosePath(ros::NodeHandle &nh)
     {
-        path_pub_ = nh.advertise<nav_msgs::Path>("path", 1);
+        path_pub_ = nh.advertise<nav_msgs::Path>("plan", 1);
         start_ = Node3D();
         goal_ = Node3D();
         hasGoal = false;
         hasStart = false;
     }
 
-    void PosePath::setStart(const geometry_msgs::PoseStamped& start)
+    void PosePath::setStart(const geometry_msgs::PoseStamped &start)
     {
         hasStart = true;
-        geometry_msgs::PoseStamped start_pose;
-        listener.transformPose("/hy_map", ros::Time(0), start, "/map", start_pose);
-        start_.setX(start_pose.pose.position.x);
-        start_.setY(start_pose.pose.position.y);
-        start_.setYaw(tf::getYaw(start_pose.pose.orientation));
+        tf::StampedTransform transform;
+        try
+        {
+            listener.lookupTransform("/map", "/hy_map", ros::Time(0), transform);
+            double pose[3] = {start.pose.position.x, start.pose.position.y, tf::getYaw(start.pose.orientation)};
+            pose[0] -= transform.getOrigin().x();
+            pose[1] -= transform.getOrigin().y();
+            pose[0] = pose[0] * cos(transform.getRotation().getAngle()) + pose[1] * sin(transform.getRotation().getAngle());
+            pose[1] = -pose[0] * sin(transform.getRotation().getAngle()) + pose[1] * cos(transform.getRotation().getAngle());
+            pose[2] -= transform.getRotation().getAngle();
+            start_.setX(pose[0]);
+            start_.setY(pose[1]);
+            start_.setYaw(pose[2]);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+        }
     }
 
-    void PosePath::setGoal(const geometry_msgs::PoseStamped& goal)
+    void PosePath::setGoal(const geometry_msgs::PoseStamped &goal)
     {
         hasGoal = true;
         geometry_msgs::PoseStamped goal_pose;
@@ -63,7 +76,10 @@ namespace hybrid_a_star
             pose.header.stamp = ros::Time::now();
             pose.pose.position.x = node.getX();
             pose.pose.position.y = node.getY();
-            pose.pose.position.z = 0;
+            if (node.isBackward())
+                pose.pose.position.z = 0.5;
+            else
+                pose.pose.position.z = 0;
             pose.pose.orientation = tf::createQuaternionMsgFromYaw(node.getYaw());
             listener.transformPose("/map", ros::Time(0), pose, "/hy_map", pose);
             pose.header.frame_id = "/map";

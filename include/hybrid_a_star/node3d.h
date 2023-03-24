@@ -40,13 +40,12 @@ namespace hybrid_a_star
             int setIdx(int dimX, int dimY, int dimYaw, double deltaXY);
             int getIdx() const {return idx;}
             bool isBackward() const {return backward;}
-            void setBackward(bool backward) {backward = backward;}
+            void setBackward(bool back) {backward = back;}
             void updateG();
             void updateH(const Node3D* goal);
             bool operator==(const Node3D &rhs) const;
 
             //Motion primitives
-            // R = 6, 6.75 DEG
             std::vector<double> dy = {0., 0.0152, -0.0152}; 
             std::vector<double> dx = {0.174, 0.174, 0.174};
             std::vector<double> dyaw = {0, 0.174, -0.174};

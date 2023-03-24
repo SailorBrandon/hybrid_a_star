@@ -1,0 +1,11 @@
+<launch>
+
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find hybrid_a_star)/maps/room_mini.yaml"/>
+    
+    <node name="hybrid_a_star_node" pkg="hybrid_a_star" type="hybrid_a_star_node" output="screen"/>
+    <!-- ??? redundant transform issue when using namespace -->
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find hybrid_a_star)/rviz/try_hybrid_a_star.rviz"/>
+
+
+</launch>
