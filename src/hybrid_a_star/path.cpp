@@ -17,6 +17,7 @@ namespace hybrid_a_star
         tf::StampedTransform transform;
         try
         {
+            listener.waitForTransform("/map", "/hy_map", ros::Time(0), ros::Duration(1.0));
             listener.lookupTransform("/map", "/hy_map", ros::Time(0), transform);
             double pose[3] = {start.pose.position.x, start.pose.position.y, tf::getYaw(start.pose.orientation)};
             pose[0] -= transform.getOrigin().x();
