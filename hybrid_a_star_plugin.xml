@@ -1,0 +1,7 @@
+<library path="lib/libhybrid_a_star_lib">
+  <class name="hybrid_a_star/HybridAStar" type="hybrid_a_star::PlannerManager" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>
+      A basic reproduction of the Hybrid A* planning algorithm.
+    </description>
+  </class>
+</library>

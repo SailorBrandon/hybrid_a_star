@@ -11,12 +11,15 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   costmap_2d
+  base_local_planner
+  nav_core
+  pluginlib
 )
 
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES hybrid_a_star
- CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs tf costmap_2d
+ CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs tf costmap_2d base_local_planner nav_core pluginlib
 )
 
 find_package(ompl REQUIRED)
@@ -24,25 +27,17 @@ find_package(ompl REQUIRED)
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${OMPL_INCLUDE_DIRS}
 )
 
-add_library(${PROJECT_NAME}
+add_library(hybrid_a_star_lib
+  src/hybrid_a_star/planner_manager.cpp
   src/hybrid_a_star/hybrid_a_star.cpp
-  src/hybrid_a_star/tf_broadcaster.cpp
-  src/hybrid_a_star/path.cpp
   src/hybrid_a_star/node3d.cpp
-  src/hybrid_a_star/space.cpp
   src/hybrid_a_star/reeds_shepp.cpp
 )
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME} ${OMPL_LIBRARIES})
-
-add_executable(${PROJECT_NAME}_node src/hybrid_a_star_node.cpp)
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node
+add_dependencies(hybrid_a_star_lib ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(hybrid_a_star_lib
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
 )
 
 catkin_install_python(PROGRAMS
