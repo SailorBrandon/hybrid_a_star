@@ -10,10 +10,13 @@ $ source devel/setup.bash
 ```
 
 # How to use
+This planner is written as a [global planner plugin](http://wiki.ros.org/navigation/Tutorials/Writing%20A%20Global%20Path%20Planner%20As%20Plugin%20in%20ROS) of the ROS Navigation Stack. To use it, simply add the following tag to your launch file:
 ```
-$ roslaunch hybrid_a_star tune_hybrid_a_star.launch
+<node pkg="move_base" type="move_base" name="move_base" output="screen">
+  <param name="base_global_planner" value="hybrid_a_star/HybridAStar" />
+  ...
+</node>
 ```
-Then you can set the initial and goal position in RViz.
 
 # Reference
 https://github.com/karlkurzer/path_planner
