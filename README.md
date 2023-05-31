@@ -19,7 +19,8 @@ This planner is written as a [global planner plugin](http://wiki.ros.org/navigat
 ```
 
 # Reference
-https://github.com/karlkurzer/path_planner
+- How to design the planner: https://github.com/karlkurzer/path_planner
+- How to write the planner as a ROS plugin: https://github.com/dengpw/hybrid_astar_planner
 
 # TODO
 - [ ] Add map inflation
